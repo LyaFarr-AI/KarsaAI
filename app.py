@@ -1,17 +1,19 @@
-# app.py
 import streamlit as st
 import requests
 
-API_URL_CB = "https://lyafarr-ai-chatbot-backend.hf.space/chatbot"
+API_URL = "https://lyafarr-ai-backend-api-karsaai.hf.space"
 
+API_URL_CB = "https://lyafarr-ai-chatbot-backend.hf.space"
 
-#def generate_poem_remote(prompt):
-#    response = requests.post(f"{API_URL_CB}/generate-puisi", json={"prompt": prompt})
-#    return response.json().get("result", "❌ Terjadi kesalahan.")
-#
-#def generate_pantun_remote(prompt):
-#    response = requests.post(f"{API_URL_CB}/generate-pantun", json={"prompt": prompt})
-#    return response.json().get("result", "❌ Terjadi kesalahan.")
+# Function
+def generate_poem_lstm_remote(prompt):
+    response = requests.post(f"{API_URL}/generate-poem", json={"prompt": prompt})
+    return response.json().get("result", "❌ Terjadi kesalahan.")
+
+def generate_pantun_lstm_remote(prompt):
+    response = requests.post(f"{API_URL}/generate-pantun", json={"prompt": prompt})
+    return response.json().get("result", "❌ Terjadi kesalahan.")
+
 
 def chatbot_remote(prompt):
     response = requests.post(f"{API_URL_CB}/chatbot", json={"prompt": prompt})
@@ -19,11 +21,11 @@ def chatbot_remote(prompt):
 
 def generate_poem_remote(prompt):
     response = requests.post(f"{API_URL_CB}/chatbot", json={"prompt": f"Tolong buatkan puisi bertema: {prompt}"})
-    return response.json().get("result", "Terjadi kesalahan.")
+    return response.json().get("result", "❌ Terjadi kesalahan.")
 
-def generate_pantun_remote(prompt):
-    response = requests.post(f"{API_URL_CB}/chatbot", json={"prompt": f"Tolong buatkan pantun dengan input {prompt}"})
-    return response.json().get("result", "Terjadi kesalahan.")
+def generate_pantun_remote(jenis, prompt):
+    response = requests.post(f"{API_URL_CB}/chatbot", json={"prompt": f"Buatkan 1 Pantun saja, dengan {jenis} dan tema {prompt}"})
+    return response.json().get("result", "❌ Terjadi kesalahan.")
 
 
 st.set_page_config(page_title="AI Poet Generator", page_icon="🧠", layout="centered")
@@ -96,21 +98,48 @@ if menu == "Beranda":
 
 
 # ========================= PUISI =========================
-if menu == "Puisi":
+elif menu == "Puisi":
     st.header("📜 Generator Puisi")
+
+    # Pilihan model
+    opsi_model = st.selectbox("🎛️ Pilih model AI:", ["Quality", "Fast"])
+
+    if opsi_model == "Quality":
+        st.caption("⚡ Quality (Direkomendasikan) – Output lebih puitis dan bermakna, waktu generate 1–2 menit.")
+    else:
+        st.caption("🚀 Fast (LSTM) – 🚫 Tidak direkomendasikan, karena masih dalam tahap pengembangan.")
+
+    # Input tema
     seed = st.text_input("Masukkan tema / kata awal:")
     generate = st.button("Generate Puisi")
 
     if generate and seed:
         with st.spinner("🔄 Sedang membuat puisi..."):
-            result = generate_poem_remote(seed)
+
+            if opsi_model == "Fast":
+                result = generate_poem_lstm_remote(seed)
+                full_prompt = f"FastModel - {seed}"
+            else:
+                result = generate_poem_remote(seed)
+                full_prompt = f"Quality - {seed}"
+
         st.subheader("📝 Hasil Puisi")
         st.markdown(result)
-        st.session_state["history"].append(("Puisi", seed, result))
+        st.session_state["history"].append(("Puisi", full_prompt, result))
 
 # ========================= PANTUN =========================
 elif menu == "Pantun":
     st.header("🎭 Generator Pantun")
+    st.caption("Generator Pantun masih dalam tahap pengembangan")
+    # Pilihan model
+    opsi_model = st.selectbox("🎛️ Pilih model AI:", ["Quality", "Fast"])
+
+    if opsi_model == "Quality":
+        st.caption("⚡ Quality (Direkomendasikan) – Output lebih bagus, tapi waktu generate 1–2 menit.")
+    else:
+        st.caption("🚀 Fast (LSTM) – 🚫 Tidak direkomendasikan. karena belum mendukung jenis pantun dan masih dalam tahap pengembangan.")
+
+    # Input pantun
     jenis = st.selectbox("Pilih jenis pantun", [
         "Pantun Cinta", "Pantun Jenaka", "Pantun Pendidikan", "Pantun Agama",
         "Pantun Anak-anak", "Pantun Budi", "Pantun Adat dan Alam", "Pantun Teka-Teki"
@@ -119,9 +148,15 @@ elif menu == "Pantun":
     generate = st.button("Generate Pantun")
 
     if generate and tema:
-        full_prompt = f"{jenis} - {tema}"
         with st.spinner("🌀 Sedang membuat pantun..."):
-            result = generate_pantun_remote(full_prompt)
+
+            if opsi_model == "Fast":
+                result = generate_pantun_lstm_remote(tema)
+                full_prompt = f"FastModel - {tema}"
+            else:
+                result = generate_pantun_remote(jenis, tema)
+                full_prompt = f"{jenis} - {tema}"
+
         st.subheader("🎭 Hasil Pantun")
         st.markdown(result)
         st.session_state["history"].append(("Pantun", full_prompt, result))
@@ -154,8 +189,9 @@ elif menu == "Tentang":
         <ul>
             <li><code>PyTorch</code></li>
             <li><code>Streamlit</code></li>
-            <li><code>Transformers (Hugging Face)</code></li>
-            <li><code>LSTM</code> untuk puisi & pantun, dan <code>GPT-2</code> untuk chatbot</li>
+            <li><code>LSTM</code> untuk puisi & pantun, dan</li>
+            <li><code>Gemma yang sudah di finetuning jadi Eunoia-Gemma-9B-o1-Indo-i1</code></li>
+            <li><code>Transformers (Hugging Face)</code>untuk chatbot</li>
         </ul>
         </div>
         """,
