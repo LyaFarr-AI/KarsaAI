@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+transformers
+torch
+scikit-learn
+pandas
+gradio
+huggingface_hub
+numpy
+tqdm
+joblib
