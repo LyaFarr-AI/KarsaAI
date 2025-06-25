@@ -43,18 +43,32 @@ Users can input a theme or keyword, and the app generates meaningful text based 
 
 ```bash
 .
-├── app.py                 # Streamlit frontend
-├── backend/
-│   ├── main.py           # FastAPI entrypoint
-│   ├── model_poem/       # LSTM model & resources for poems
-│   └── model_pantun/     # LSTM model & resources for pantun
-├── utils/
-│   ├── generate_poem.py
-│   ├── generate_pantun.py
-│   └── preprocessing.py
+├── app.py                                       # Streamlit frontend
+├── lstm_backend/
+│   ├── Dockerfile                              
+|   ├── requirements.txt
+│   └── app/                                     # LSTM model
+|       ├── main.py                              # FastAPI entrypoint
+│       ├─── utils/
+|       |    ├── generate_poem.py
+│       |    ├── generate_pantun.py
+│       |    └── preprocessing.py
+|       |
+|       ├── data/
+│       |   ├── slangwords.txt
+│       |   ├── slang_indo.csv
+│       |   └── stopwords.txt
+│       |
+|       └── model/
+│           ├── poem_lstm.pth  <-----------------# Releases
+│           ├── poem_idx2word.pkl
+│           ├── poem_word2_idx.pkl
+│           ├── pantun_lstm.pth
+│           ├── pantun_idx2word.pkl
+│           └── pantun_word2_idx.pkl
 |
-├── data/
-│   ├── slangwords.txt
-│   ├── slang_indo.csv
-│   └── stopwords.txt
-│   └── suku-kata-id.json
+├── chatbot_backend/
+    ├── Dockerfile                              
+    ├── requirements.txt
+    └── app/                                     # Chatbot
+        └── main.py       
