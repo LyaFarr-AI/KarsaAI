@@ -54,6 +54,7 @@ Users can input a theme or keyword, and the app generates meaningful text based 
 │   └── preprocessing.py
 |
 ├── data/
-│   ├── pantun.csv
-│   ├── pantun1.csv
-│   └── preprocessing.py
+│   ├── slangwords.txt
+│   ├── slang_indo.csv
+│   └── stopwords.txt
+│   └── suku-kata-id.json
